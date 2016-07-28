@@ -1,25 +1,27 @@
 try:
     from django.apps import apps
+    from django.db import models
 except ImportError:
     # Django < 1.7. Make stub object
     apps = lambda: None
     apps.ready = True
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models.loading import get_app, get_models, get_model, load_app
-
+from django.apps import apps
+#from django.db.models.loading import get_app, get_models, get_model, load_app
 
 def get_all_models(app):
-    try:
-        app_mod = load_app(app)  # First try full path
-    except ImportError:
-        app_mod = get_app(app)  # Then try just app_label
-    return get_models(app_mod)
+    #try:
+        #app_mod = apps.load_app(app)  # First try full path
+    #except ImportError:
+    #app_mod = apps.get_app(app)  # Then try just app_label
+    #return apps.get_models(app_mod)
+    return apps.get_app_config(app).get_models()
 
 
 def gel_listed_models(app, l):
     def parse(model):
-        m = get_model(app, model)
+        m = apps.get_model(app, model)
         if m is None:
             raise ImproperlyConfigured(
                 'SYNCHRO_MODELS: Model %s not found in %s app.' % (model, app))
@@ -49,6 +51,8 @@ def get_intermediary(models):
 
 MODELS = INTER_MODELS = []
 
+TIME_ZONE = 'UTC+3'
+USE_TZ = True
 
 def prepare():
     global MODELS, INTER_MODELS
